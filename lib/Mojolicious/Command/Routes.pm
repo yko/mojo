@@ -39,9 +39,21 @@ sub _draw {
 
     # Length
     my $length = 0;
+    my $method_length = 0;
+    my $name_length = 0;
     for my $node (@$routes) {
         my $l = length $node->[0];
         $length = $l if $l > $length;
+
+        my %conds  = @{$node->[1]->conditions};
+        my $methods = join ', ', @{$conds{'method'} || []};
+        $l = length($methods);
+        $method_length = $l if $l > $method_length;
+
+        $l = length($node->[1]->name || '');
+
+        $name_length = $l if $l > $name_length;
+        push @$node, uc($methods);
     }
 
     # Draw
@@ -49,32 +61,52 @@ sub _draw {
 
         # Regex
         $node->[1]->pattern->_compile;
-        my $regex = $node->[1]->pattern->regex;
+        my $regex = join '', map {
+            1 while s/\(\?\w*-\w+:(.*)\)/$1/;
+            s/\^//;
+            $_;
+        }@{$node->[2]};
+
 
         # Padding
         my $name = $node->[0];
         my $padding = ' ' x ($length - length $name);
-
+        my $type = 'R';
+        $type = 'B' if $node->[1]->inline;
+        $type = 'W' if $node->[1]->block;
         # Print
-        print "$name$padding   $regex\n";
+
+        my $methods = pop @$node; 
+
+        my $mpadding = ' ' x ($method_length - length($methods || ''));
+
+        my $npadding = ' ' x ($name_length - length($node->[1]->name || ''));
+
+        print "[$type] $name$padding   $methods$mpadding   " . ($node->[1]->name || '') . "$npadding   $regex\n";
     }
 }
 
 sub _walk {
-    my ($self, $node, $depth, $routes) = @_;
+    my ($self, $node, $depth, $routes, $parent) = @_;
+
+    $parent ||= [];
 
     # Line
     my $pattern = $node->pattern->pattern || '/';
     my $name    = $node->name;
+
     my $line    = ' ' x ($depth * 4);
     $line .= $pattern;
 
     # Store
-    push @$routes, [$line, $node];
+    $node->pattern->_compile;
+    push @$parent, $node->pattern->regex;
+    push @$routes, [$line, $node, [@$parent]];
 
     # Walk
     $depth++;
-    $self->_walk($_, $depth, $routes) for @{$node->children};
+    $self->_walk($_, $depth, $routes, $parent) for @{$node->children};
+    pop @$parent;
     $depth--;
 }
 
