@@ -792,19 +792,23 @@ $t->get_ok('/template_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
-    "<title>Welcome</title>\nSidebar!\nLayout content\nHello World!\nDefault footer!\n");
+    "<title>Welcome</title>\nSidebar!\nLayout content\nHello World!\nDefault footer!\n"
+  );
 
 # GET /layout_without_inheritance
 $t->get_ok('/layout_without_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Default header!\nDefault sidebar!\nLayout content\nDefault footer!\n");
+  ->content_is(
+    "Default header!\nDefault sidebar!\nLayout content\nDefault footer!\n");
 
 # GET /double_inheritance
 $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("<title>Welcome</title>\nSidebar too!\nLayout content\nHello World!\nDefault footer!\n");
+  ->content_is(
+    "<title>Welcome</title>\nSidebar too!\nLayout content\nHello World!\nDefault footer!\n"
+  );
 
 # GET /nested-includes
 $t->get_ok('/nested-includes')->status_is(200)

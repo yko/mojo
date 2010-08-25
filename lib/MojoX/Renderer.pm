@@ -129,10 +129,6 @@ sub render {
 
         # Render
         $self->handler->{text}->($self, $c, \$output, {text => $text});
-
-        # Extends
-        $content->{content} = b("$output")
-          if ($c->stash->{extends} || $c->stash->{layout});
     }
 
     # Data
@@ -140,10 +136,6 @@ sub render {
 
         # Render
         $self->handler->{data}->($self, $c, \$output, {data => $data});
-
-        # Extends
-        $content->{content} = b("$output")
-          if ($c->stash->{extends} || $c->stash->{layout});
     }
 
     # JSON
@@ -152,10 +144,6 @@ sub render {
         # Render
         $self->handler->{json}->($self, $c, \$output, {json => $json});
         $format = 'json';
-
-        # Extends
-        $content->{content} = b("$output")
-          if ($c->stash->{extends} || $c->stash->{layout});
     }
 
     # Template or templateless handler
@@ -163,11 +151,11 @@ sub render {
 
         # Render
         return unless $self->_render_template($c, \$output, $options);
-
-        # Extends
-        $content->{content} = b("$output")
-          if ($c->stash->{extends} || $c->stash->{layout});
     }
+
+    # Extends
+    $content->{content} = b("$output")
+        if ($c->stash->{extends} || $c->stash->{layout});
 
     # Extends
     while ((my $extends = $self->_extends($c)) && !$json && !$data) {
