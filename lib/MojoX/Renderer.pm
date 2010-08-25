@@ -185,6 +185,9 @@ sub render {
 
         # Render
         $self->_render_template($c, \$output, $options);
+
+        # Extends
+        $content->{content} = b("$output");
     }
 
     # Encoding (JSON is already encoded)
