@@ -6,7 +6,7 @@ use warnings;
 # Disable epoll and kqueue
 BEGIN { $ENV{MOJO_POLL} = 1 }
 
-use Test::More tests => 194;
+use Test::More tests => 198;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -265,4 +265,11 @@ $t->get_ok('/foo/session')->status_is(200)
 
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
-  ->content_like(qr/<\?xml version="1.0" encoding="UTF-8"\?><rss \/>/)
+  ->content_like(qr/<\?xml version="1.0" encoding="UTF-8"\?><rss \/>/);
+
+
+# SyntaxError::foo (syntax error in controller)
+$t->get_ok('/waypoint')->status_is(500)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Get after waypoint/);

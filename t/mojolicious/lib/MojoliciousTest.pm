@@ -38,6 +38,9 @@ sub startup {
     # Routes
     my $r = $self->routes;
 
+    my $way = $r->waypoint('/waypoint');
+    $way->get('/')->to(cb => sub { shift->render_text('Get after waypoint') });
+
     # /auth (authentication bridge)
     my $auth = $r->bridge('/auth')->to(
         cb => sub {
